@@ -6,6 +6,11 @@ from scipy.integrate import odeint
 
 class SpaceTetherSimulation:
     def __init__(self):
+        """
+        Initialize the Space Tether Simulation.
+
+        This class simulates the dynamics of a space tether in orbit around the Earth.
+        """
         self.G = 6.67430e-11  # Gravitational constant
         self.M_earth = 5.97e24  # Mass of Earth (kg)
         self.R_earth = 6371e3  # Radius of Earth (m)
@@ -28,6 +33,11 @@ class SpaceTetherSimulation:
         self.simulate()
 
     def setup_plot(self):
+        """
+        Set up the plot for the simulation.
+
+        This function sets up the plot axes, draws the Earth, and initializes the tether plot.
+        """
         self.ax.set_xlim(-self.orbit_radius*1.5, self.orbit_radius*1.5)
         self.ax.set_ylim(-self.orbit_radius*1.5, self.orbit_radius*1.5)
         self.ax.set_aspect('equal', 'box')
@@ -44,8 +54,13 @@ class SpaceTetherSimulation:
         
         # Text annotations
         self.time_text = self.ax.text(0.02, 0.95, '', transform=self.ax.transAxes)
-        
+
     def setup_sliders(self):
+        """
+        Set up the sliders for the simulation.
+
+        This function sets up the sliders for the tether length, orbit height, and payload mass.
+        """
         slider_color = 'lightgoldenrodyellow'
         ax_length = plt.axes([0.1, 0.2, 0.8, 0.03], facecolor=slider_color)
         ax_orbit = plt.axes([0.1, 0.15, 0.8, 0.03], facecolor=slider_color)
@@ -58,13 +73,23 @@ class SpaceTetherSimulation:
         self.length_slider.on_changed(self.update)
         self.orbit_slider.on_changed(self.update)
         self.mass_slider.on_changed(self.update)
-        
+
     def setup_buttons(self):
+        """
+        Set up the buttons for the simulation.
+
+        This function sets up the simulate button.
+        """
         ax_simulate = plt.axes([0.8, 0.025, 0.1, 0.04])
         self.button_simulate = Button(ax_simulate, 'Simulate', color='lightblue', hovercolor='0.975')
         self.button_simulate.on_clicked(self.simulate)
 
     def update(self, val):
+        """
+        Update the simulation parameters.
+
+        This function updates the tether length, orbit height, and payload mass based on the slider values.
+        """
         self.tether_length = self.length_slider.val * 1000
         self.orbit_radius = self.R_earth + self.orbit_slider.val * 1000
         self.payload_mass = self.mass_slider.val
@@ -75,6 +100,18 @@ class SpaceTetherSimulation:
         self.ax.set_ylim(-self.orbit_radius*1.5, self.orbit_radius*1.5)
 
     def tether_dynamics(self, state, t):
+        """
+        Calculate the dynamics of the tether.
+
+        This function calculates the gravitational and centrifugal forces on the tether and updates the state of the system.
+
+        Parameters:
+        state (list): The current state of the system (x, y, vx, vy, theta, omega)
+        t (float): The current time
+
+        Returns:
+        list: The updated state of the system
+        """
         x, y, vx, vy, theta, omega = state
         
         r = np.sqrt(x**2 + y**2)
@@ -98,6 +135,14 @@ class SpaceTetherSimulation:
         return [dx_dt, dy_dt, dvx_dt, dvy_dt, dtheta_dt, domega_dt]
 
     def simulate(self, event=None):
+        """
+        Run the simulation.
+
+        This function runs the simulation by solving the equations of motion using odeint and updating the plot.
+
+        Parameters:
+        event (None): Not used
+        """
         if self.ani is not None:
             self.ani.event_source.stop()
         
@@ -110,6 +155,17 @@ class SpaceTetherSimulation:
         plt.draw()
 
     def animate(self, i):
+        """
+        Update the plot for the current frame.
+
+        This function updates the plot by drawing the tether and payload at the current position.
+
+        Parameters:
+        i (int): The current frame number
+
+        Returns:
+        list: The updated plot elements
+        """
         x, y = self.solution[i, 0], self.solution[i, 1]
         theta = self.solution[i, 4]
         
@@ -123,6 +179,11 @@ class SpaceTetherSimulation:
         return self.tether_line, self.com_point, self.time_text
 
     def run(self):
+        """
+        Run the simulation.
+
+        This function runs the simulation by calling the simulate function.
+        """
         plt.show()
 
 # Run the simulation
